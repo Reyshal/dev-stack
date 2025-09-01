@@ -15,15 +15,6 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 ## Services
 
 ### MySQL 8.0
-- **8 pre-configured databases**:
-  - `beautyhaul_dev`
-  - `somethinc_dev`
-  - `push_stock_dev`
-  - `hintofyou_dev`
-  - `email_service_dev`
-  - `currency_dev`
-  - `biteship_dev`
-  - `amaterasun_dev`
 - **SQL Mode:** Disabled (`sql_mode = ""`) for maximum compatibility
 - **Authentication:** `mysql_native_password`
 
@@ -66,8 +57,8 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
    mysql -h localhost -P 3306 -u root -p
    # Password: rootpassword
    
-   mysql -h localhost -P 3306 -u reyshal -p
-   # Password: pass123
+   mysql -h localhost -P 3306 -u admin -p
+   # Password: admin123
    
    # Elasticsearch
    curl http://localhost:9200
@@ -226,7 +217,7 @@ services:
 
 2. **MySQL import taking too long:** Large database files may take several minutes to import. Check logs with `docker-compose logs -f mysql`
 
-3. **SQL Mode:** MySQL is configured with `sql_mode = ""` (disabled) for maximum compatibility with legacy applications
+3. **SQL Mode:** MySQL is configured with `sql_mode = ""` (disabled) for maximum compatibility with legacy applications, You can change it if you want
 
 4. **Elasticsearch memory issues:** If Elasticsearch fails to start, increase memory allocation by changing `ES_JAVA_OPTS` in docker-compose.yml
 
