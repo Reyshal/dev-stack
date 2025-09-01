@@ -15,8 +15,8 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 ## Services
 
 ### MySQL 8.0
-- **SQL Mode:** Disabled (`sql_mode = ""`) for maximum compatibility
-- **Authentication:** `mysql_native_password`
+- **SQL Mode:** Disabled (`sql_mode = ""`) for maximum compatibility - customize as needed
+- **Authentication:** `mysql_native_password` - customize as needed
 
 ### Elasticsearch 8.11.0
 - Single-node setup for development
@@ -129,7 +129,7 @@ cp mysql-init/99_init-user.sql.example mysql-init/99_init-user.sql
 nano mysql-init/99_init-user.sql
 ```
 
-The example file contains a template for creating the `reyshal` user. Modify it to create your own users with custom usernames, passwords, and privileges.
+The example file contains a template for creating the `admin` user. Modify it to create your own users with custom usernames, passwords, and privileges.
 
 ## Management Commands
 
@@ -191,8 +191,8 @@ services:
       # MySQL
       - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_USER=reyshal
-      - DB_PASSWORD=pass123
+      - DB_USER=admin
+      - DB_PASSWORD=admin123
       
       # Elasticsearch
       - ES_HOST=elasticsearch
