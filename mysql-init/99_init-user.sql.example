@@ -1,0 +1,11 @@
+-- Create user with mysql_native_password authentication -> customize as needed
+CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED WITH mysql_native_password BY 'admin123';
+
+-- Grant all privileges on all databases to admin user -> customize as needed
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%';
+
+-- Flush privileges to ensure changes take effect
+FLUSH PRIVILEGES;
+
+-- Show created user
+SELECT User, Host, plugin FROM mysql.user WHERE User = 'admin';

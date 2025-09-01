@@ -1,0 +1,31 @@
+# Ignore all SQL files in mysql-init folder except the example file
+mysql-init/*.sql
+!mysql-init/99_init-user.sql.example
+
+# Docker volumes and data
+mysql_data/
+elasticsearch_data/
+redis_data/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
