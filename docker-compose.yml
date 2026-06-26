@@ -70,12 +70,25 @@ services:
       - dev-stack-network
     command: redis-server --appendonly yes
 
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: dev-stack-redisinsight
+    restart: unless-stopped
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight:/data
+    networks:
+      - dev-stack-network
+
 volumes:
   mysql_data:
     driver: local
   elasticsearch_data:
     driver: local
   redis_data:
+    driver: local
+  redisinsight:
     driver: local
 
 networks:
