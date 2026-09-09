@@ -5,31 +5,37 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 ## Features
 
 - **MySQL 8.0** server with 8 pre-configured databases
+- **phpMyAdmin** for database management via browser
 - **Elasticsearch 8.11.0** for search and analytics
 - **Memcached 1.6** for high-performance caching
+- **phpCacheAdmin** for modern Memcached GUI management and analytics
 - **Redis 7** for advanced caching and data structures
+- **RedisInsight** for Redis data visualization and management
 - **Custom network** (`dev-stack-network`) for container communication
 - **Persistent data** storage using Docker volumes
 - **Automatic database import** from the `mysql-init/` folder
 
 ## Services
 
-### MySQL 8.0
+### MySQL 8.0 & phpMyAdmin
 - **SQL Mode:** Disabled (`sql_mode = ""`) for maximum compatibility - customize as needed
 - **Authentication:** `mysql_native_password` - customize as needed
+- **Web UI (phpMyAdmin):** Accessible at `http://localhost:8090`
 
 ### Elasticsearch 8.11.0
 - Single-node setup for development
 - Security disabled for easy access
 - 512MB heap size allocated
 
-### Memcached 1.6
+### Memcached 1.6 & phpCacheAdmin
 - 256MB memory limit
 - High-performance caching
+- **Web UI (phpCacheAdmin):** Accessible at `http://localhost:8091` (modern dark-mode GUI for keys, metrics, and console)
 
-### Redis 7
+### Redis 7 & RedisInsight
 - Persistence enabled with AOF
 - Advanced data structures support
+- **Web UI (RedisInsight):** Accessible at `http://localhost:5540`
 
 ## Quick Start
 
@@ -108,6 +114,11 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 - **Port:** `11211`
 - **Memory:** 256MB
 - **Network:** `dev-stack-network`
+
+### Web Management Interfaces
+- **phpCacheAdmin (Memcached Viewer):** [http://localhost:8091](http://localhost:8091)
+- **RedisInsight (Redis Viewer):** [http://localhost:5540](http://localhost:5540)
+- **phpMyAdmin (MySQL Admin):** [http://localhost:8090](http://localhost:8090)
 
 ## Database Import
 
@@ -211,9 +222,12 @@ services:
 
 1. **Port already in use:** Change the port mappings in `docker-compose.yml`:
    - MySQL: `"3307:3306"`
+   - phpMyAdmin: `"8092:80"`
    - Elasticsearch: `"9201:9200"`
    - Redis: `"6380:6379"`
+   - RedisInsight: `"5541:5540"`
    - Memcached: `"11212:11211"`
+   - phpCacheAdmin: `"8093:80"`
 
 2. **MySQL import taking too long:** Large database files may take several minutes to import. Check logs with `docker-compose logs -f mysql`
 

@@ -58,6 +58,21 @@ services:
     networks:
       - dev-stack-network
 
+  phpcacheadmin:
+    image: robinn/phpcacheadmin:latest
+    container_name: dev-stack-phpcacheadmin
+    restart: unless-stopped
+    ports:
+      - "8091:80"
+    environment:
+      - PCA_MEMCACHED_0_NAME=Memcached
+      - PCA_MEMCACHED_0_HOST=memcached
+      - PCA_MEMCACHED_0_PORT=11211
+    networks:
+      - dev-stack-network
+    depends_on:
+      - memcached
+
   redis:
     image: redis:7-alpine
     container_name: dev-stack-redis
