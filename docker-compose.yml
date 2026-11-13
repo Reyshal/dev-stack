@@ -40,6 +40,9 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - http.cors.enabled=true
+      - http.cors.allow-origin=http://localhost:8092
+      - http.cors.allow-headers=X-Requested-With,Content-Type,Content-Length,Authorization
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -47,6 +50,19 @@ services:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
       - dev-stack-network
+
+  elasticvue:
+    image: cars10/elasticvue:latest
+    container_name: dev-stack-elasticvue
+    restart: unless-stopped
+    ports:
+      - "8092:8080"
+    environment:
+      - 'ELASTICVUE_CLUSTERS=[{"name":"dev-stack","uri":"http://localhost:9200"}]'
+    networks:
+      - dev-stack-network
+    depends_on:
+      - elasticsearch
 
   memcached:
     image: memcached:1.6-alpine

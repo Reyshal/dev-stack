@@ -7,6 +7,7 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 - **MySQL 8.0** server with 8 pre-configured databases
 - **phpMyAdmin** for database management via browser
 - **Elasticsearch 8.11.0** for search and analytics
+- **Elasticvue** for browsing and querying Elasticsearch data
 - **Memcached 1.6** for high-performance caching
 - **phpCacheAdmin** for modern Memcached GUI management and analytics
 - **Redis 7** for advanced caching and data structures
@@ -22,10 +23,12 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 - **Authentication:** `mysql_native_password` - customize as needed
 - **Web UI (phpMyAdmin):** Accessible at `http://localhost:8090`
 
-### Elasticsearch 8.11.0
+### Elasticsearch 8.11.0 & Elasticvue
 - Single-node setup for development
 - Security disabled for easy access
 - 512MB heap size allocated
+- CORS enabled for `http://localhost:8092` so Elasticvue can connect from the browser
+- **Web UI (Elasticvue):** Accessible at `http://localhost:8092` (cluster `dev-stack` is preconfigured)
 
 ### Memcached 1.6 & phpCacheAdmin
 - 256MB memory limit
@@ -119,6 +122,7 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 - **phpCacheAdmin (Memcached Viewer):** [http://localhost:8091](http://localhost:8091)
 - **RedisInsight (Redis Viewer):** [http://localhost:5540](http://localhost:5540)
 - **phpMyAdmin (MySQL Admin):** [http://localhost:8090](http://localhost:8090)
+- **Elasticvue (Elasticsearch Viewer):** [http://localhost:8092](http://localhost:8092)
 
 ## Database Import
 
@@ -222,12 +226,13 @@ services:
 
 1. **Port already in use:** Change the port mappings in `docker-compose.yml`:
    - MySQL: `"3307:3306"`
-   - phpMyAdmin: `"8092:80"`
+   - phpMyAdmin: `"8095:80"`
    - Elasticsearch: `"9201:9200"`
    - Redis: `"6380:6379"`
    - RedisInsight: `"5541:5540"`
    - Memcached: `"11212:11211"`
    - phpCacheAdmin: `"8093:80"`
+   - Elasticvue: `"8094:8080"` (also update `http.cors.allow-origin` on Elasticsearch to the new port)
 
 2. **MySQL import taking too long:** Large database files may take several minutes to import. Check logs with `docker-compose logs -f mysql`
 
