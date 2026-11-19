@@ -1,13 +1,15 @@
 # Dev Stack Setup
 
-This Docker Compose setup provides a complete development stack with MySQL, Elasticsearch, Memcached, and Redis.
+This Docker Compose setup provides a complete development stack with MySQL, Elasticsearch, Memcached, and Redis, plus Kibana and APM Server for application performance monitoring.
 
 ## Features
 
 - **MySQL 8.0** server with 8 pre-configured databases
 - **phpMyAdmin** for database management via browser
-- **Elasticsearch 8.11.0** for search and analytics
+- **Elasticsearch 8.19.25** for search and analytics
 - **Elasticvue** for browsing and querying Elasticsearch data
+- **Kibana 8.19.25** for exploring Elasticsearch data and the APM UI (traces, dependencies, errors)
+- **APM Server 8.19.25** to receive data from Elastic APM agents in your apps
 - **Memcached 1.6** for high-performance caching
 - **phpCacheAdmin** for modern Memcached GUI management and analytics
 - **Redis 7** for advanced caching and data structures
@@ -23,12 +25,25 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 - **Authentication:** `mysql_native_password` - customize as needed
 - **Web UI (phpMyAdmin):** Accessible at `http://localhost:8090`
 
-### Elasticsearch 8.11.0 & Elasticvue
+### Elasticsearch 8.19.25 & Elasticvue
 - Single-node setup for development
 - Security disabled for easy access
 - 512MB heap size allocated
 - CORS enabled for `http://localhost:8092` so Elasticvue can connect from the browser
 - **Web UI (Elasticvue):** Accessible at `http://localhost:8092` (cluster `dev-stack` is preconfigured)
+
+### Kibana & APM Server (8.19.25)
+- **APM Server** listens on `http://localhost:8200` and writes to Elasticsearch. Point your app's Elastic APM agent at it; no secret token or API key is needed
+- **Kibana** reads from the same Elasticsearch, with no login. Open **Observability → APM → Services** to see your app, its transactions, and the MySQL/Redis/Elasticsearch/Memcached calls it makes (**Dependencies** tab)
+- RUM (browser agent) intake is enabled, with all origins allowed
+- APM index templates and ingest pipelines are installed by Elasticsearch itself (built in since 8.15), so Fleet is not needed. Fleet can't be used here anyway, because it requires Elasticsearch security
+- Elasticsearch, Kibana, and APM Server versions **must match**. Bump all three together
+- **Web UI (Kibana):** Accessible at `http://localhost:5601` (APM: `http://localhost:5601/app/apm`)
+
+Quick check that APM Server is ready (`"publish_ready": true`):
+```bash
+curl http://localhost:8200
+```
 
 ### Memcached 1.6 & phpCacheAdmin
 - 256MB memory limit
@@ -58,6 +73,8 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
    docker-compose logs elasticsearch
    docker-compose logs memcached
    docker-compose logs redis
+   docker-compose logs kibana
+   docker-compose logs apm-server
    ```
 
 4. **Connect to services:**
@@ -106,6 +123,12 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 - **Network:** `dev-stack-network`
 - **Security:** Disabled for development
 
+### APM Server
+- **URL:** `http://localhost:8200` (from host machine) or `http://apm-server:8200` (from other containers)
+- **Auth:** None (no secret token / API key)
+- **Network:** `dev-stack-network`
+- Typical agent env vars: `ELASTIC_APM_SERVER_URL=http://localhost:8200`, `ELASTIC_APM_SERVICE_NAME=<your-app>`, `ELASTIC_APM_ENVIRONMENT=dev`
+
 ### Redis
 - **Host:** `localhost` (from host machine) or `redis` (from other containers)
 - **Port:** `6379`
@@ -122,6 +145,7 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 - **phpCacheAdmin (Memcached Viewer):** [http://localhost:8091](http://localhost:8091)
 - **RedisInsight (Redis Viewer):** [http://localhost:5540](http://localhost:5540)
 - **phpMyAdmin (MySQL Admin):** [http://localhost:8090](http://localhost:8090)
+- **Kibana (Elasticsearch + APM UI):** [http://localhost:5601](http://localhost:5601) (APM: [http://localhost:5601/app/apm](http://localhost:5601/app/apm))
 - **Elasticvue (Elasticsearch Viewer):** [http://localhost:8092](http://localhost:8092)
 
 ## Database Import
@@ -193,6 +217,7 @@ Other containers can connect to all services using the service names as hostname
 - **Elasticsearch:** `elasticsearch:9200`
 - **Redis:** `redis:6379`
 - **Memcached:** `memcached:11211`
+- **APM Server:** `apm-server:8200`
 - **Network:** `dev-stack-network`
 
 Example for another service in the same network:
@@ -220,6 +245,11 @@ services:
       # Memcached
       - MEMCACHED_HOST=memcached
       - MEMCACHED_PORT=11211
+
+      # Elastic APM agent
+      - ELASTIC_APM_SERVER_URL=http://apm-server:8200
+      - ELASTIC_APM_SERVICE_NAME=my-app
+      - ELASTIC_APM_ENVIRONMENT=dev
 ```
 
 ## Troubleshooting
@@ -233,6 +263,8 @@ services:
    - Memcached: `"11212:11211"`
    - phpCacheAdmin: `"8093:80"`
    - Elasticvue: `"8094:8080"` (also update `http.cors.allow-origin` on Elasticsearch to the new port)
+   - Kibana: `"5602:5601"`
+   - APM Server: `"8201:8200"` (also update `ELASTIC_APM_SERVER_URL` in your app)
 
 2. **MySQL import taking too long:** Large database files may take several minutes to import. Check logs with `docker-compose logs -f mysql`
 
