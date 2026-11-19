@@ -22,8 +22,10 @@ Data services keep their standard ports; every web UI lives in the 79xx block (f
 
 ```bash
 docker compose config -q                  # validate the compose file after editing
-docker compose up -d                      # start everything
+docker compose up -d                      # start data services + viewers
+docker compose --profile apm up -d        # also start Kibana + APM Server (opt-in, `apm` profile)
 docker compose up -d <service> [<viewer>] # (re)create only what changed
+docker compose --profile '*' config -q    # validate including profiled services
 docker compose ps
 docker compose logs -f <service>
 curl http://localhost:9200/_cluster/health
@@ -33,6 +35,7 @@ curl http://localhost:9200/_cluster/health
 
 - **Adding a service:** follow the existing pattern — `container_name: dev-stack-<name>`, `restart: unless-stopped`, `networks: [dev-stack-network]`, a named volume declared under top-level `volumes:` if it persists data, and `depends_on` for viewers. A new web UI takes the next free 79xx host port (its README fallback goes in 791x). Then update every relevant README section: Features list, Services section, Connection Details / "Web Management Interfaces", and the Troubleshooting alternate-port list (keep alternate ports from colliding with real ones).
 - **Elasticvue ↔ Elasticsearch coupling:** Elasticvue runs in the user's browser and calls `http://localhost:9200` directly, so Elasticsearch has `http.cors.*` env vars whose `allow-origin` must match Elasticvue's host port (7903). Change one, change the other.
+- **Opt-in profiles:** Kibana and APM Server are in the `apm` profile so they don't start (or restart at boot) with the core stack. Put any other heavy, occasionally used service behind a profile too, and keep the README's start commands in sync.
 - **Elastic version lockstep (ES / Kibana / APM Server):** all three images must use the same version tag. Don't drop below 8.15: the stack runs with ES security disabled, so Kibana Fleet is unavailable ("Kibana security must be enabled to use Fleet") and can't install the APM integration package. From 8.15, ES's built-in `apm-data` plugin installs the APM templates and pipelines instead. On older versions, APM Server stays at `publish_ready: false`. The ES data volume upgrades in place and can't be downgraded.
 - **MySQL init scripts:** `./mysql-init` is mounted to `/docker-entrypoint-initdb.d` and its `.sql` files run in alphabetical order **only when the `mysql_data` volume is empty**. Re-importing requires `docker compose down -v` (destroys all service volumes) or removing just the MySQL volume. The local `mysql-init/*.sql` dumps are gitignored and very large (multiple GB) — never read them whole or try to commit them.
 - **User-creation template:** the tracked example lives at `mysql-init-example/99_init_user.sql.example` (moved in a refactor). The README and `.gitignore` still reference the old path `mysql-init/99_init-user.sql.example`; fix those if touching that area.

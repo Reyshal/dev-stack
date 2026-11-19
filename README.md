@@ -33,6 +33,7 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 - **Web UI (Elasticvue):** Accessible at `http://localhost:7903` (cluster `dev-stack` is preconfigured)
 
 ### Kibana & APM Server (8.19.25)
+- **Opt-in:** both are in the `apm` profile, so a plain `docker compose up -d` doesn't start them (Kibana alone uses ~650MB RAM). Start them with `docker compose --profile apm up -d`, stop them with `docker compose --profile apm stop kibana apm-server`. Apps with an APM agent keep working while APM Server is off; the agent only logs that it can't connect
 - **APM Server** listens on `http://localhost:8200` and writes to Elasticsearch. Point your app's Elastic APM agent at it; no secret token or API key is needed
 - **Kibana** reads from the same Elasticsearch, with no login. Open **Observability → APM → Services** to see your app, its transactions, and the MySQL/Redis/Elasticsearch/Memcached calls it makes (**Dependencies** tab)
 - RUM (browser agent) intake is enabled, with all origins allowed
@@ -57,9 +58,10 @@ curl http://localhost:8200
 
 ## Quick Start
 
-1. **Start all services:**
+1. **Start the services:**
    ```bash
-   docker-compose up -d
+   docker-compose up -d                  # data services + viewers
+   docker-compose --profile apm up -d    # also Kibana + APM Server
    ```
 
 2. **Check if all containers are running:**
