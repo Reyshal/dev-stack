@@ -22,7 +22,7 @@ services:
     container_name: dev-stack-phpmyadmin
     restart: unless-stopped
     ports:
-      - "8090:80"
+      - "7901:80"
     environment:
       PMA_HOST: mysql
       PMA_USER: root
@@ -41,7 +41,7 @@ services:
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - http.cors.enabled=true
-      - http.cors.allow-origin=http://localhost:8092
+      - http.cors.allow-origin=http://localhost:7903
       - http.cors.allow-headers=X-Requested-With,Content-Type,Content-Length,Authorization
     ports:
       - "9200:9200"
@@ -56,7 +56,7 @@ services:
     container_name: dev-stack-elasticvue
     restart: unless-stopped
     ports:
-      - "8092:8080"
+      - "7903:8080"
     environment:
       - 'ELASTICVUE_CLUSTERS=[{"name":"dev-stack","uri":"http://localhost:9200"}]'
     networks:
@@ -69,7 +69,7 @@ services:
     container_name: dev-stack-kibana
     restart: unless-stopped
     ports:
-      - "5601:5601"
+      - "7905:5601"
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       # Dev-only key (min 32 chars); enables Kibana alerting/rules used by the APM UI
@@ -119,7 +119,7 @@ services:
     container_name: dev-stack-phpcacheadmin
     restart: unless-stopped
     ports:
-      - "8091:80"
+      - "7902:80"
     environment:
       - PCA_MEMCACHED_0_NAME=Memcached
       - PCA_MEMCACHED_0_HOST=memcached
@@ -146,7 +146,7 @@ services:
     container_name: dev-stack-redisinsight
     restart: unless-stopped
     ports:
-      - "5540:5540"
+      - "7904:5540"
     volumes:
       - redisinsight:/data
     networks:

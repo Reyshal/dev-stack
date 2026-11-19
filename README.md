@@ -23,14 +23,14 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 ### MySQL 8.0 & phpMyAdmin
 - **SQL Mode:** Disabled (`sql_mode = ""`) for maximum compatibility - customize as needed
 - **Authentication:** `mysql_native_password` - customize as needed
-- **Web UI (phpMyAdmin):** Accessible at `http://localhost:8090`
+- **Web UI (phpMyAdmin):** Accessible at `http://localhost:7901`
 
 ### Elasticsearch 8.19.25 & Elasticvue
 - Single-node setup for development
 - Security disabled for easy access
 - 512MB heap size allocated
-- CORS enabled for `http://localhost:8092` so Elasticvue can connect from the browser
-- **Web UI (Elasticvue):** Accessible at `http://localhost:8092` (cluster `dev-stack` is preconfigured)
+- CORS enabled for `http://localhost:7903` so Elasticvue can connect from the browser
+- **Web UI (Elasticvue):** Accessible at `http://localhost:7903` (cluster `dev-stack` is preconfigured)
 
 ### Kibana & APM Server (8.19.25)
 - **APM Server** listens on `http://localhost:8200` and writes to Elasticsearch. Point your app's Elastic APM agent at it; no secret token or API key is needed
@@ -38,7 +38,7 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 - RUM (browser agent) intake is enabled, with all origins allowed
 - APM index templates and ingest pipelines are installed by Elasticsearch itself (built in since 8.15), so Fleet is not needed. Fleet can't be used here anyway, because it requires Elasticsearch security
 - Elasticsearch, Kibana, and APM Server versions **must match**. Bump all three together
-- **Web UI (Kibana):** Accessible at `http://localhost:5601` (APM: `http://localhost:5601/app/apm`)
+- **Web UI (Kibana):** Accessible at `http://localhost:7905` (APM: `http://localhost:7905/app/apm`)
 
 Quick check that APM Server is ready (`"publish_ready": true`):
 ```bash
@@ -48,12 +48,12 @@ curl http://localhost:8200
 ### Memcached 1.6 & phpCacheAdmin
 - 256MB memory limit
 - High-performance caching
-- **Web UI (phpCacheAdmin):** Accessible at `http://localhost:8091` (modern dark-mode GUI for keys, metrics, and console)
+- **Web UI (phpCacheAdmin):** Accessible at `http://localhost:7902` (modern dark-mode GUI for keys, metrics, and console)
 
 ### Redis 7 & RedisInsight
 - Persistence enabled with AOF
 - Advanced data structures support
-- **Web UI (RedisInsight):** Accessible at `http://localhost:5540`
+- **Web UI (RedisInsight):** Accessible at `http://localhost:7904`
 
 ## Quick Start
 
@@ -142,11 +142,11 @@ curl http://localhost:8200
 - **Network:** `dev-stack-network`
 
 ### Web Management Interfaces
-- **phpCacheAdmin (Memcached Viewer):** [http://localhost:8091](http://localhost:8091)
-- **RedisInsight (Redis Viewer):** [http://localhost:5540](http://localhost:5540)
-- **phpMyAdmin (MySQL Admin):** [http://localhost:8090](http://localhost:8090)
-- **Kibana (Elasticsearch + APM UI):** [http://localhost:5601](http://localhost:5601) (APM: [http://localhost:5601/app/apm](http://localhost:5601/app/apm))
-- **Elasticvue (Elasticsearch Viewer):** [http://localhost:8092](http://localhost:8092)
+- **phpCacheAdmin (Memcached Viewer):** [http://localhost:7902](http://localhost:7902)
+- **RedisInsight (Redis Viewer):** [http://localhost:7904](http://localhost:7904)
+- **phpMyAdmin (MySQL Admin):** [http://localhost:7901](http://localhost:7901)
+- **Kibana (Elasticsearch + APM UI):** [http://localhost:7905](http://localhost:7905) (APM: [http://localhost:7905/app/apm](http://localhost:7905/app/apm))
+- **Elasticvue (Elasticsearch Viewer):** [http://localhost:7903](http://localhost:7903)
 
 ## Database Import
 
@@ -256,14 +256,14 @@ services:
 
 1. **Port already in use:** Change the port mappings in `docker-compose.yml`:
    - MySQL: `"3307:3306"`
-   - phpMyAdmin: `"8095:80"`
+   - phpMyAdmin: `"7911:80"`
    - Elasticsearch: `"9201:9200"`
    - Redis: `"6380:6379"`
-   - RedisInsight: `"5541:5540"`
+   - RedisInsight: `"7914:5540"`
    - Memcached: `"11212:11211"`
-   - phpCacheAdmin: `"8093:80"`
-   - Elasticvue: `"8094:8080"` (also update `http.cors.allow-origin` on Elasticsearch to the new port)
-   - Kibana: `"5602:5601"`
+   - phpCacheAdmin: `"7912:80"`
+   - Elasticvue: `"7913:8080"` (also update `http.cors.allow-origin` on Elasticsearch to the new port)
+   - Kibana: `"7915:5601"`
    - APM Server: `"8201:8200"` (also update `ELASTIC_APM_SERVER_URL` in your app)
 
 2. **MySQL import taking too long:** Large database files may take several minutes to import. Check logs with `docker-compose logs -f mysql`
