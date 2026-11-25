@@ -100,6 +100,10 @@ services:
       - apm-server.kibana.host=http://kibana:5601
       - -E
       - output.elasticsearch.hosts=["http://elasticsearch:9200"]
+      # Optional: `APM_SECRET_TOKEN=<token> docker compose --profile apm up -d apm-server` makes agents
+      # send ELASTIC_APM_SECRET_TOKEN (like staging/prod). Unset/empty = no auth.
+      - -E
+      - apm-server.auth.secret_token=${APM_SECRET_TOKEN:-}
     networks:
       - dev-stack-network
     depends_on:

@@ -34,7 +34,8 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 
 ### Kibana & APM Server (9.5.7)
 - **Opt-in:** both are in the `apm` profile, so a plain `docker compose up -d` doesn't start them (Kibana alone uses ~650MB RAM). Start them with `docker compose --profile apm up -d`, stop them with `docker compose --profile apm stop kibana apm-server`. Apps with an APM agent keep working while APM Server is off; the agent only logs that it can't connect
-- **APM Server** listens on `http://localhost:8200` and writes to Elasticsearch. Point your app's Elastic APM agent at it; no secret token or API key is needed
+- **APM Server** listens on `http://localhost:8200` and writes to Elasticsearch. Point your app's Elastic APM agent at it; no secret token or API key is needed by default
+- **Optional secret token** (to reproduce a staging/prod setup): start APM Server with `APM_SECRET_TOKEN=<token> docker compose --profile apm up -d apm-server`, and give the app `ELASTIC_APM_SECRET_TOKEN=<token>` (plain `http://` works). Agents with no token are rejected with `403 anonymous access not permitted`, and a wrong token gets `401 authentication failed`. Run the same command without `APM_SECRET_TOKEN` to turn auth off again. To check a token: `curl -H "Authorization: Bearer <token>" http://localhost:8200` returns the version info only when the token is valid
 - **Kibana** reads from the same Elasticsearch, with no login. Open **Observability → APM → Services** to see your app, its transactions, and the MySQL/Redis/Elasticsearch/Memcached calls it makes (**Dependencies** tab)
 - RUM (browser agent) intake is enabled, with all origins allowed
 - APM index templates and ingest pipelines are installed by Elasticsearch itself (built in since 8.15), so Fleet is not needed. Fleet can't be used here anyway, because it requires Elasticsearch security
@@ -128,7 +129,7 @@ curl http://localhost:8200
 
 ### APM Server
 - **URL:** `http://localhost:8200` (from host machine) or `http://apm-server:8200` (from other containers)
-- **Auth:** None (no secret token / API key)
+- **Auth:** None by default; optional secret token via `APM_SECRET_TOKEN` (see [Kibana & APM Server](#kibana--apm-server-957))
 - **Network:** `dev-stack-network`
 - Typical agent env vars: `ELASTIC_APM_SERVER_URL=http://localhost:8200`, `ELASTIC_APM_SERVICE_NAME=<your-app>`, `ELASTIC_APM_ENVIRONMENT=dev`
 
