@@ -6,10 +6,10 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 
 - **MySQL 8.0** server with 8 pre-configured databases
 - **phpMyAdmin** for database management via browser
-- **Elasticsearch 8.19.25** for search and analytics
+- **Elasticsearch 9.5.7** for search and analytics
 - **Elasticvue** for browsing and querying Elasticsearch data
-- **Kibana 8.19.25** for exploring Elasticsearch data and the APM UI (traces, dependencies, errors)
-- **APM Server 8.19.25** to receive data from Elastic APM agents in your apps
+- **Kibana 9.5.7** for exploring Elasticsearch data and the APM UI (traces, dependencies, errors)
+- **APM Server 9.5.7** to receive data from Elastic APM agents in your apps
 - **Memcached 1.6** for high-performance caching
 - **phpCacheAdmin** for modern Memcached GUI management and analytics
 - **Redis 7** for advanced caching and data structures
@@ -25,20 +25,21 @@ This Docker Compose setup provides a complete development stack with MySQL, Elas
 - **Authentication:** `mysql_native_password` - customize as needed
 - **Web UI (phpMyAdmin):** Accessible at `http://localhost:7901`
 
-### Elasticsearch 8.19.25 & Elasticvue
+### Elasticsearch 9.5.7 & Elasticvue
 - Single-node setup for development
 - Security disabled for easy access
 - 512MB heap size allocated
 - CORS enabled for `http://localhost:7903` so Elasticvue can connect from the browser
 - **Web UI (Elasticvue):** Accessible at `http://localhost:7903` (cluster `dev-stack` is preconfigured)
 
-### Kibana & APM Server (8.19.25)
+### Kibana & APM Server (9.5.7)
 - **Opt-in:** both are in the `apm` profile, so a plain `docker compose up -d` doesn't start them (Kibana alone uses ~650MB RAM). Start them with `docker compose --profile apm up -d`, stop them with `docker compose --profile apm stop kibana apm-server`. Apps with an APM agent keep working while APM Server is off; the agent only logs that it can't connect
 - **APM Server** listens on `http://localhost:8200` and writes to Elasticsearch. Point your app's Elastic APM agent at it; no secret token or API key is needed
 - **Kibana** reads from the same Elasticsearch, with no login. Open **Observability → APM → Services** to see your app, its transactions, and the MySQL/Redis/Elasticsearch/Memcached calls it makes (**Dependencies** tab)
 - RUM (browser agent) intake is enabled, with all origins allowed
 - APM index templates and ingest pipelines are installed by Elasticsearch itself (built in since 8.15), so Fleet is not needed. Fleet can't be used here anyway, because it requires Elasticsearch security
-- Elasticsearch, Kibana, and APM Server versions **must match**. Bump all three together
+- Elasticsearch, Kibana, and APM Server versions **must match**. Bump all three together. All three images come from `docker.elastic.co`, because Docker Hub's `elasticsearch` image falls behind on new patch releases
+- Starting a newer Elasticsearch upgrades the `elasticsearch_data` volume in place. An older version can't open it afterwards, so going back means removing the volume and re-indexing
 - **Web UI (Kibana):** Accessible at `http://localhost:7905` (APM: `http://localhost:7905/app/apm`)
 
 Quick check that APM Server is ready (`"publish_ready": true`):
